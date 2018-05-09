@@ -5,15 +5,13 @@ var mapping;
 chrome.runtime.sendMessage({ name: 'getData' }, items => {
 	window.isEnabled = items.isEnabled;
 	window.mapping = items.mapping;
-	if (isEnabled)
-		findReplace(document.body);
+	processText(document.body, isEnabled ? 2 : 0);
 
 	// Parse DOM on change
 	new MutationObserver(mutations => {
-		if (document.hidden || !window.isEnabled) return;
 		for (var mutation of mutations)
 			for (var node of mutation.addedNodes)
-				findReplace(node);
+				processText(node, !document.hidden && isEnabled ? 2 : 0);
 	}).observe(document.body, {
 		childList: true,
 		attributes: true,
@@ -22,48 +20,54 @@ chrome.runtime.sendMessage({ name: 'getData' }, items => {
 	});
 });
 
-// Listen for messages from background script
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-	window.mapping = msg;
-});
-
-// Listen for connections from popup
-chrome.runtime.onConnect.addListener(port => {
-	window.port = port;
-	port.onMessage.addListener(msg => {
-		window.isEnabled = msg;
-		if (isEnabled)
-			findReplace(document.body);
-	});
-	port.onDisconnect.addListener(() => { window.port = null; });
-});
-
-// Parse DOM if changed on tab activation
+// Update data from background script on tab activation
 document.addEventListener('visibilitychange', () => {
 	if (document.hidden) return;
 	chrome.runtime.sendMessage({ name: 'getData' }, items => {
 		window.isEnabled = items.isEnabled;
 		window.mapping = items.mapping;
-		if (isEnabled)
-			findReplace(document.body);
+		processText(document.body, isEnabled ? 3 : 1);
 	});
 });
 
-// Find and replace within descendent text nodes
-function findReplace(parentNode) {
+// Listen for messages from popup and background script
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+	switch (msg.name) {
+		case 'isEnabled':
+			window.isEnabled = msg.isEnabled;
+			break;
+		case 'mapping':
+			window.mapping = msg.mapping;
+	}
+	processText(document.body, isEnabled ? 3 : 1);
+});
+
+// Recursively process text within descendent text nodes
+function processText(parentNode, mode) {
 	for (var node of parentNode.childNodes) {
 		switch (node.nodeType) {
 			case 1:    // element node
 			case 11:   // document fragment node
 				if (!/SCRIPT|STYLE/.test(node.nodeName))
-					findReplace(node);
+					processText(node, mode);
 				break;
 			case 3:    // text node
-				let str = node.nodeValue;
-				let out = '';
-				for (var i = 0, sLen = str.length; i < sLen; i++)
-					out += mapping[str[i]] || str[i];
-				node.nodeValue = out;
+				switch (mode) {
+					case 0:    // cache text
+						node.originalText = node.nodeValue;
+						break;
+					case 1:    // restore text
+						node.nodeValue = node.originalText;
+						break;
+					case 2:    // cache and replace text
+						node.originalText = node.nodeValue;
+					case 3:    // replace text
+						let str = node.originalText || node.nodeValue;
+						let out = '';
+						for (var i = 0, sLen = str.length; i < sLen; i++)
+							out += mapping[str[i]] || str[i];
+						node.nodeValue = out;
+				}
 		}
 	}
 }

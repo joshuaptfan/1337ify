@@ -41,7 +41,7 @@ input {
 	margin-right: 0.8rem;
 	background-color: grey;
 	border-radius: 0.5rem;
-	box-shadow: 0 0.1rem 0.3rem;
+	box-shadow: 0 0.05rem 0.2rem;
 }
 
 #toggle-enabled:checked + label::after {

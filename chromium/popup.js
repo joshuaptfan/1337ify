@@ -2,11 +2,6 @@ document.onreadystatechange = function () {
 	document.getElementById('toggle-enabled').addEventListener('change', () => { setIsEnabled(!window.isEnabled); });
 	document.getElementById('set-mapping').addEventListener('change', e => { setMapping(e.target.value) });
 
-	// Establish port to active tab
-	chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-		window.port = chrome.tabs.connect(tabs[0].id);
-	});
-
 	// Retrieve data from local storage
 	chrome.storage.local.get(null, items => {
 		setIsEnabled(items.isEnabled || items.isEnabled === undefined);
@@ -16,13 +11,14 @@ document.onreadystatechange = function () {
 
 function setIsEnabled(isEnabled) {
 	window.isEnabled = isEnabled;
+	// Save data in local storage
 	chrome.storage.local.set({ isEnabled });
 	// Update background script
 	chrome.runtime.sendMessage({ name: 'isEnabled', isEnabled });
 	// Update active tab
-	try {
-		window.port.postMessage(isEnabled);
-	} catch (e) {}
+	chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+		chrome.tabs.sendMessage(tabs[0].id, { name: 'isEnabled', isEnabled });
+	});
 	document.getElementById('toggle-enabled').checked = isEnabled;
 }
 

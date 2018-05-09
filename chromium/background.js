@@ -5,7 +5,7 @@ var mapping;
 // Retrieve data from local storage
 chrome.storage.local.get(null, items => {
 	isEnabled = items.isEnabled || true;
-	if (items.mapping && items.fileName) {
+	if (items.fileName && items.mapping) {
 		window.fileName = items.fileName;
 		window.mapping = items.mapping;
 	} else
@@ -37,7 +37,7 @@ function loadMapping(fileName) {
 		chrome.storage.local.set({ fileName, mapping });
 		// Update active tab
 		chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-			chrome.tabs.sendMessage(tabs[0].id, mapping);
+			chrome.tabs.sendMessage(tabs[0].id, { name: 'mapping', mapping });
 		});
 	};
 	xhr.send();
