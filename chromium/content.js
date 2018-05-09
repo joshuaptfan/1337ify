@@ -1,17 +1,10 @@
 var isEnabled;
-var charMap = Object.freeze({
-	'a': '4',
-	'e': '3',
-	'g': '6',
-	'i': '1',
-	'o': '0',
-	's': '5',
-	't': '7'
-});
+var mapping;
 
-// Check auto/manual mode on load
-chrome.runtime.sendMessage('', isEnabled => {
-	window.isEnabled = isEnabled;
+// Retrieve data from background script on load
+chrome.runtime.sendMessage({ name: 'getData' }, items => {
+	window.isEnabled = items.isEnabled;
+	window.mapping = items.mapping;
 	if (isEnabled)
 		findReplace(document.body);
 
@@ -29,11 +22,16 @@ chrome.runtime.sendMessage('', isEnabled => {
 	});
 });
 
+// Listen for messages from background script
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+	window.mapping = msg;
+});
+
 // Listen for connections from popup
 chrome.runtime.onConnect.addListener(port => {
 	window.port = port;
-	port.onMessage.addListener(isEnabled => {
-		window.isEnabled = isEnabled;
+	port.onMessage.addListener(msg => {
+		window.isEnabled = msg;
 		if (isEnabled)
 			findReplace(document.body);
 	});
@@ -43,8 +41,9 @@ chrome.runtime.onConnect.addListener(port => {
 // Parse DOM if changed on tab activation
 document.addEventListener('visibilitychange', () => {
 	if (document.hidden) return;
-	chrome.runtime.sendMessage('', isEnabled => {
-		window.isEnabled = isEnabled;
+	chrome.runtime.sendMessage({ name: 'getData' }, items => {
+		window.isEnabled = items.isEnabled;
+		window.mapping = items.mapping;
 		if (isEnabled)
 			findReplace(document.body);
 	});
@@ -60,10 +59,10 @@ function findReplace(parentNode) {
 					findReplace(node);
 				break;
 			case 3:    // text node
-				var str = node.nodeValue.toLowerCase();
-				var out = '';
+				let str = node.nodeValue;
+				let out = '';
 				for (var i = 0, sLen = str.length; i < sLen; i++)
-					out += charMap[str[i]] || node.nodeValue[i];
+					out += mapping[str[i]] || str[i];
 				node.nodeValue = out;
 		}
 	}
