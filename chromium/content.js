@@ -64,8 +64,24 @@ function processText(parentNode, mode) {
 					case 3:    // replace text
 						let str = node.originalText || node.nodeValue;
 						let out = '';
-						for (var i = 0, sLen = str.length; i < sLen; i++)
-							out += mapping[str[i]] || str[i];
+						for (var i = 0, sLen = str.length; i < sLen; i++) {
+							if (!mapping[str[i]])
+								out += str[i];
+							else {
+								let currentNode = mapping[str[i]];
+								let depth = 0;
+								let result = '';
+								while (true) {
+									if (currentNode.value)
+										result = currentNode.value;
+									if (currentNode[str[i + depth + 1]])
+										currentNode = currentNode[str[i + ++depth]];
+									else break;
+								}
+								out += result || str.slice(i, i + depth + 1);
+								i += depth;
+							}
+						}
 						node.nodeValue = out;
 				}
 		}

@@ -1,3 +1,3 @@
 # 1337ify
 
-Converts text on web pages to [leetspeak](https://en.wikipedia.org/wiki/Leet).
+Chrome extension that converts text on web pages to [leetspeak](https://en.wikipedia.org/wiki/Leet).

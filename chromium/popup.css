@@ -5,7 +5,7 @@ select {
 }
 
 body {
-	width: 8rem;
+	width: 7rem;
 	user-select: none;
 }
 
@@ -54,5 +54,5 @@ input {
 }
 
 select {
-	width: 8rem;
+	width: 7rem;
 }

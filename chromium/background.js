@@ -32,7 +32,8 @@ function loadMapping(fileName) {
 	let xhr = new XMLHttpRequest();
 	xhr.open('GET', 'mappings/' + fileName + '.json', true);
 	xhr.onload = () => {
-		window.mapping = Object.freeze(JSON.parse(xhr.responseText));
+		window.mapping = {};
+		buildTrie(JSON.parse(xhr.responseText), window.mapping);
 		// Save data in local storage
 		chrome.storage.local.set({ fileName, mapping });
 		// Update active tab
@@ -41,4 +42,22 @@ function loadMapping(fileName) {
 		});
 	};
 	xhr.send();
+}
+
+// Build trie from object of word/result pairs
+function buildTrie(obj, root) {
+	let currentNode;
+	for (var key in obj) {
+		// Set root as current node
+		currentNode = root;
+		for (var char of key) {
+			// Create child node for character if undefined
+			currentNode[char] = currentNode[char] || {};
+			// Set child as current node
+			currentNode = currentNode[char];
+		}
+		// Store current value in leaf node
+		currentNode.value = obj[key];
+	}
+	console.log(window.mapping);
 }
