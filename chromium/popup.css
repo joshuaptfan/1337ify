@@ -5,7 +5,7 @@ select {
 }
 
 body {
-	width: 7rem;
+	width: 12rem;
 	user-select: none;
 }
 
@@ -13,15 +13,15 @@ input {
 	display: none;
 }
 
-#toggle-enabled + label {
+.toggle + label {
 	position: relative;
 	float: right;
 	height: 1rem;
 	cursor: pointer;
 }
 
-#toggle-enabled + label::before,
-#toggle-enabled + label::after {
+.toggle + label::before,
+.toggle + label::after {
 	position: absolute;
 	top: 0.1rem;
 	bottom: 0.1rem;
@@ -33,7 +33,7 @@ input {
 	transition: all 0.2s;
 }
 
-#toggle-enabled + label::after {
+.toggle + label::after {
 	top: 0;
 	bottom: 0;
 	right: 0;
@@ -44,15 +44,61 @@ input {
 	box-shadow: 0 0.05rem 0.2rem;
 }
 
-#toggle-enabled:checked + label::after {
+.toggle:checked + label::after {
 	margin-right: 0;
 	background-color: #08F;
 }
 
-#toggle-enabled + label:hover::after {
+.toggle + label:hover::after {
 	background-color: #49F;
 }
 
 select {
-	width: 7rem;
+	width: 100%;
+}
+
+#edit-mapping {
+	margin: 0.5rem 0;
+	border: 0.02rem solid silver;
+}
+
+.mapping-branch {
+	position: relative;
+	width: 100%;
+	margin: 0;
+	border: 0.05rem solid #EEE;
+}
+
+.mapping-key {
+	float: left;
+	width: 3.7rem;
+	margin: 0.2rem;
+	padding: 0.2rem;
+	border: 0.05rem solid silver;
+	border-radius: 0.1rem;
+	cursor: text;
+}
+
+.mapping-value-row {
+	margin-left: 4.6rem;
+}
+
+.mapping-value {
+	display: inline-block;
+	width: 3.7rem;
+	margin: 0.2rem;
+	padding: 0.2rem;
+	border: 0.05rem solid silver;
+	border-radius: 0.1rem;
+	cursor: text;
+}
+
+.mapping-probability {
+	display: inline-block;
+	width: 1.8rem;
+	margin: 0.2rem;
+	padding: 0.2rem;
+	border: 0.05rem solid silver;
+	border-radius: 0.1rem;
+	text-align: right;
 }

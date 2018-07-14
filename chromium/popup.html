@@ -6,7 +6,7 @@
 	<script src='popup.js' defer></script>
 </head>
 <body>
-	<p>Enabled<input type='checkbox' id='toggle-enabled'><label for='toggle-enabled'></label></p>
+	<p>Enabled<input type='checkbox' class='toggle' id='toggle-enabled'><label for='toggle-enabled'></label></p>
 	<select id='set-mapping'>
 		<option value='leet'>Leet</option>
 		<option value='faux Cyrillic'>Faux Cyrillic</option>
@@ -19,6 +19,9 @@
 		<option value='faux Slovene'>Faux Slovene</option>
 		<option value='faux Spanish'>Faux Spanish</option>
 		<option value='faux Turkish'>Faux Turkish</option>
+		<option value='none'>None</option>
 	</select>
+	<div id='edit-mapping'></div>
+	<p>Zalgo<input type='checkbox' class='toggle' id='toggle-zalgo'><label for='toggle-zalgo'></label></p>
 </body>
 </html>
