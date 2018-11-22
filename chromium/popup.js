@@ -2,8 +2,6 @@ document.onreadystatechange = function () {
 	document.getElementById('toggle-enabled').addEventListener('change', () => { setIsEnabled(!window.isEnabled); });
 	document.getElementById('set-mapping').addEventListener('change', e => { setMapping(e.target.value) });
 
-	var background = chrome.extension.getBackgroundPage();
-
 	// Retrieve data from local storage
 	chrome.storage.local.get(null, items => {
 		setIsEnabled(items.isEnabled || items.isEnabled === undefined);
